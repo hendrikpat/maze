@@ -25,6 +25,10 @@ html, body {
     display: inline-block;
     margin: auto;
     border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
 }
 #mazeContainer #mazeCanvas {
     margin: 0;
@@ -128,6 +132,7 @@ input:focus, select:focus {
 
 #instructions {
     margin-top: 425px;
+    display: none;
 }
 
 #timer, #score {
@@ -383,15 +388,16 @@ input:focus, select:focus {
     display: block;
   }
   #mazeCanvas {
-    width: 90%;
+    width: 80%;
     height: auto;
   }
   #menu select, #menu input[type="button"] {
     font-size: 0.8em;
     padding: 5px;
+    width: auto;
   }
   #menu .custom-select {
-    width: 100%;
+    width: auto;
   }
   body {
     overflow: hidden;
