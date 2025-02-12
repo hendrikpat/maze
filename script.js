@@ -541,7 +541,6 @@ function rand(max) {
           fingerCount,
           fingerData
         ) {
-          console.log(direction);
           switch (direction) {
             case "up":
               check({
