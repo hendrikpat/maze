@@ -382,6 +382,20 @@ input:focus, select:focus {
   #showCompletedMazesBtn, #showHighscoresBtn {
     display: block;
   }
+  #mazeCanvas {
+    width: 90%;
+    height: auto;
+  }
+  #menu select, #menu input[type="button"] {
+    font-size: 0.8em;
+    padding: 5px;
+  }
+  #menu .custom-select {
+    width: 100%;
+  }
+  body {
+    overflow: hidden;
+  }
 }
 
 #showCompletedMazesBtn, #showHighscoresBtn {
