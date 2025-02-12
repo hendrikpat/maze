@@ -994,3 +994,61 @@ function Player(maze, c, _cellsize, onComplete, sprite = null) {
     };
   }
 
+  document.addEventListener("DOMContentLoaded", function() {
+    var showHighscoresBtn = document.getElementById("showHighscoresBtn");
+    var highscoresDiv = document.getElementById("highscores");
+
+    // Show the highscores button only on smaller screens (e.g., mobile)
+    if (window.innerWidth <= 768) {
+        showHighscoresBtn.style.display = "block";
+    }
+
+    // Toggle highscores visibility when button is clicked
+    showHighscoresBtn.addEventListener("click", function() {
+        highscoresDiv.classList.toggle("active");
+    });
+
+    // Swipe to close the highscores
+    $("#highscores").swipe({
+        swipeRight: function(event, direction, distance, duration, fingerCount, fingerData) {
+            highscoresDiv.classList.remove("active");
+        },
+        threshold: 0
+    });
+
+    // Function to display the highscores
+    function displayHighscores() {
+        var highscoresList = document.getElementById("highscoresList");
+        highscoresList.innerHTML = ""; // Clear previous list
+
+        // Sort highscores in descending order
+        var sortedHighscores = Object.entries(highscores).sort(([, scoreA], [, scoreB]) => scoreB - scoreA);
+
+        sortedHighscores.forEach(function([username, score]) {
+            var highscoreEntry = document.createElement("div");
+            highscoreEntry.className = "highscore-entry";
+            highscoreEntry.innerHTML = `
+                <span>${getDeviceEmoji()} ${username}</span>
+                <span>${score}</span>
+            `;
+            highscoresList.appendChild(highscoreEntry);
+        });
+    }
+
+    // Function to determine device type and return appropriate emoji
+    function getDeviceEmoji() {
+        // Basic check (can be expanded for more accurate detection)
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            return "📱"; // Mobile
+        } else {
+            return "🖥️"; // Desktop
+        }
+    }
+
+    // Initial display of highscores
+    displayHighscores();
+
+    // Update highscores display whenever they change
+    // (You'll need to call displayHighscores() after updating highscores)
+    window.updateHighscoresDisplay = displayHighscores;
+});
