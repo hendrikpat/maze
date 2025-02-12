@@ -50,6 +50,7 @@ function rand(max) {
     volumeLevel.innerText = volumeSlider.value;
   });
   
+  //Update displayVictoryMess function to incorporate fetchHighscore and SubmitHighscore
   function displayVictoryMess() {
     var currentTime = Date.now();
     var timeTaken = currentTime - startTime;
@@ -57,35 +58,41 @@ function rand(max) {
     var seconds = Math.floor((timeTaken % 60000) / 1000);
     var milliseconds = timeTaken % 1000;
     var formattedTime = (minutes < 10 ? "0" : "") + minutes + ":" +
-                        (seconds < 10 ? "0" : "") + seconds + "." +
-                        (milliseconds < 100 ? "0" : "") + (milliseconds < 10 ? "0" : "") + milliseconds;
-  
+        (seconds < 10 ? "0" : "") + seconds + "." +
+        (milliseconds < 100 ? "0" : "") + (milliseconds < 10 ? "0" : "") + milliseconds;
     mazeTimes.push("M" + (score + 1) + " - " + formattedTime);
     updateMazeList();
-  
+
     // Play victory sound
     victorySound.pause();
     victorySound.currentTime = 0;
     victorySound.play();
-  
+
     if (gameMode === "timeRush") {
-      score++;
-      document.getElementById("score").innerText = "Score: " + score;
-      makeMaze();
-      player.bindKeyDown();
-    } else if (gameMode === "speedrun") {
-      score++;
-      document.getElementById("score").innerText = "Mazes: " + score + " / " + mazeCount;
-      if (score >= mazeCount) {
-        clearInterval(timerInterval);
-        endGame();
-      } else {
+        score++;
+        document.getElementById("score").innerText = "Score: " + score;
+        handleGameOver(score);
         makeMaze();
         player.bindKeyDown();
-      }
+    } else if (gameMode === "speedrun") {
+        score++;
+        document.getElementById("score").innerText = "Mazes: " + score + " / " + mazeCount;
+        if (score >= mazeCount) {
+            clearInterval(timerInterval);
+            endGame();
+        } else {
+            makeMaze();
+            player.bindKeyDown();
+
+            player.bindKeyDown(); // Re-bind swipe functionality after completing a maze
+        }
+    } else {
+        cancelAnimationFrame(animationId);
+        endGame();
     }
-    player.bindKeyDown(); // Re-bind swipe functionality after completing a maze
-  }
+}
+
+
   
   function updateMazeList() {
     var mazeList = document.getElementById("mazeList");
@@ -995,6 +1002,7 @@ function Player(maze, c, _cellsize, onComplete, sprite = null) {
   }
 
   document.addEventListener("DOMContentLoaded", function() {
+    getHighscores();
     var showHighscoresBtn = document.getElementById("showHighscoresBtn");
     var highscoresDiv = document.getElementById("highscores");
 
@@ -1036,19 +1044,86 @@ function Player(maze, c, _cellsize, onComplete, sprite = null) {
     }
 
     // Function to determine device type and return appropriate emoji
-    function getDeviceEmoji() {
-        // Basic check (can be expanded for more accurate detection)
-        if (/Mobi|Android/i.test(navigator.userAgent)) {
-            return "📱"; // Mobile
-        } else {
-            return "🖥️"; // Desktop
-        }
-    }
+function getDeviceEmoji() {
+  // Basic check (can be expanded for more accurate detection)
+  if (/Mobi|Android/i.test(navigator.userAgent)) {
+      return "📱"; // Mobile
+  } else {
+      return "🖥️"; // Desktop
+  }
+}
 
-    // Initial display of highscores
-    displayHighscores();
+// Function to display the highscores
+function updateHighscoresDisplay() {
+  var highscoresList = document.getElementById("highscoresList");
+  if (!highscoresList) {
+      console.error("highscoresList element not found");
+      return;
+  }
+  highscoresList.innerHTML = ""; // Clear previous list
 
-    // Update highscores display whenever they change
-    // (You'll need to call displayHighscores() after updating highscores)
-    window.updateHighscoresDisplay = displayHighscores;
-});
+  // Sort highscores in descending order
+  var sortedHighscores = Object.entries(highscores).sort(([, scoreA], [, scoreB]) => scoreB - scoreA);
+
+  sortedHighscores.forEach(function([username, score]) {
+      var highscoreEntry = document.createElement("div");
+      highscoreEntry.className = "highscore-entry";
+      highscoreEntry.innerHTML = `
+    <span>${getDeviceEmoji()} ${username}</span>
+    <span>${score}</span>
+  `;
+      highscoresList.appendChild(highscoreEntry);
+  });
+}
+
+async function getHighscores() {
+  try {
+      const response = await fetch('/api/getHighscores');
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      highscores = data || {}; // Adjust based on Upstash response structure
+      console.log("Fetched highscores:", highscores);
+      updateHighscoresDisplay(); // Update the highscores display
+  } catch (error) {
+      console.error("Failed to fetch highscores:", error);
+      // Handle error (e.g., display an error message)
+  }
+}
+
+// Function to submit a new highscore to Upstash Redis
+async function submitHighscore(username, score) {
+  try {
+      const response = await fetch('/api/addHighscore', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              username,
+              score
+          }),
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error submitting highscore: ${response.status}`);
+      }
+
+      console.log("Highscore submitted successfully");
+      await getHighscores(); // Refresh highscores after submitting
+  } catch (error) {
+      console.error("Failed to submit highscore:", error);
+      // Handle error (e.g., display an error message)
+  }
+}
+
+// Example usage: Call this function when the game ends and you have a new highscore
+function handleGameOver(score) {
+  const username = prompt("Enter your username:");
+  if (username) {
+      submitHighscore(username, score);
+  }
+}});
