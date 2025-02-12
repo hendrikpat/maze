@@ -949,3 +949,43 @@ function rand(max) {
 
   document.getElementById('refreshButton').addEventListener('click', refreshLeaderboard);
 
+  function toggleCompletedMazes() {
+    const completedMazes = document.getElementById('completedMazes');
+    completedMazes.style.display = completedMazes.style.display === 'none' ? 'block' : 'none';
+    makeDraggable(completedMazes);
+  }
+  
+  function toggleHighscores() {
+    const highscores = document.getElementById('highscores');
+    highscores.style.display = highscores.style.display === 'none' ? 'block' : 'none';
+    makeDraggable(highscores);
+  }
+  
+  function makeDraggable(element) {
+    element.classList.add('draggable');
+    element.onmousedown = function(event) {
+      let shiftX = event.clientX - element.getBoundingClientRect().left;
+      let shiftY = event.clientY - element.getBoundingClientRect().top;
+  
+      function moveAt(pageX, pageY) {
+        element.style.left = pageX - shiftX + 'px';
+        element.style.top = pageY - shiftY + 'px';
+      }
+  
+      function onMouseMove(event) {
+        moveAt(event.pageX, event.pageY);
+      }
+  
+      document.addEventListener('mousemove', onMouseMove);
+  
+      element.onmouseup = function() {
+        document.removeEventListener('mousemove', onMouseMove);
+        element.onmouseup = null;
+      };
+    };
+  
+    element.ondragstart = function() {
+      return false;
+    };
+  }
+

@@ -375,3 +375,33 @@ input:focus, select:focus {
   align-items: center;
 }
 
+@media (max-width: 768px) {
+  #completedMazes, #highscores {
+    display: none;
+  }
+  #showCompletedMazesBtn, #showHighscoresBtn {
+    display: block;
+  }
+}
+
+#showCompletedMazesBtn, #showHighscoresBtn {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+}
+
+#showCompletedMazesBtn {
+  left: 10px;
+  top: 10px;
+}
+
+#showHighscoresBtn {
+  right: 10px;
+  top: 10px;
+}
+
+.draggable {
+  position: absolute;
+  cursor: move;
+}
+
