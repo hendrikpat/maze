@@ -521,8 +521,6 @@ function rand(max) {
       }
       if (direction) {
         movePlayer(direction);
-        clearInterval(moveInterval);
-        moveInterval = setInterval(() => movePlayer(direction), moveDelay);
       }
     }
   
@@ -675,6 +673,7 @@ function rand(max) {
       document.getElementById("mazeContainer").style.opacity = "100";
     }
     gameStarted = false; // Freeze the maze
+    player.bindKeyDown(); // Re-bind swipe functionality
   }
 
   function startGame() {
