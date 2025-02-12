@@ -72,6 +72,7 @@ function rand(max) {
       score++;
       document.getElementById("score").innerText = "Score: " + score;
       makeMaze();
+      player.bindKeyDown();
     } else if (gameMode === "speedrun") {
       score++;
       document.getElementById("score").innerText = "Mazes: " + score + " / " + mazeCount;
@@ -80,6 +81,7 @@ function rand(max) {
         endGame();
       } else {
         makeMaze();
+        player.bindKeyDown();
       }
     }
     player.bindKeyDown(); // Re-bind swipe functionality after completing a maze
@@ -387,198 +389,203 @@ function rand(max) {
     var moves = 0;
     drawSprite = drawSpriteCircle;
     if (sprite != null) {
-      drawSprite = drawSpriteImg;
+        drawSprite = drawSpriteImg;
     }
+
     var player = this;
     var map = maze.map();
     var cellCoords = {
-      x: maze.startCoord().x,
-      y: maze.startCoord().y
+        x: maze.startCoord().x,
+        y: maze.startCoord().y
     };
     var cellSize = _cellsize;
     var halfCellSize = cellSize / 2;
     var moveInterval;
     var moveDelay = 100; // Delay in milliseconds
-  
+
     this.redrawPlayer = function(_cellsize) {
-      cellSize = _cellsize;
-      drawSpriteImg(cellCoords);
+        cellSize = _cellsize;
+        drawSpriteImg(cellCoords);
     };
-  
+
     function drawSpriteCircle(coord) {
-      ctx.beginPath();
-      ctx.fillStyle = "yellow";
-      ctx.arc(
-        (coord.x + 1) * cellSize - halfCellSize,
-        (coord.y + 1) * cellSize - halfCellSize,
-        halfCellSize - 2,
-        0,
-        2 * Math.PI
-      );
-      ctx.fill();
-      if (coord.x === maze.endCoord().x && coord.y === maze.endCoord().y) {
-        onComplete(moves);
-        player.unbindKeyDown();
-      }
+        ctx.beginPath();
+        ctx.fillStyle = "yellow";
+        ctx.arc(
+            (coord.x + 1) * cellSize - halfCellSize,
+            (coord.y + 1) * cellSize - halfCellSize,
+            halfCellSize - 2,
+            0,
+            2 * Math.PI
+        );
+        ctx.fill();
+        if (coord.x === maze.endCoord().x && coord.y === maze.endCoord().y) {
+            onComplete(moves);
+            player.unbindKeyDown();
+        }
     }
-  
+
     function drawSpriteImg(coord) {
-      var offsetLeft = cellSize / 50;
-      var offsetRight = cellSize / 25;
-      ctx.drawImage(
-        sprite,
-        0,
-        0,
-        sprite.width,
-        sprite.height,
-        coord.x * cellSize + offsetLeft,
-        coord.y * cellSize + offsetLeft,
-        cellSize - offsetRight,
-        cellSize - offsetRight
-      );
-      if (coord.x === maze.endCoord().x && coord.y === maze.endCoord().y) {
-        onComplete(moves);
-        player.unbindKeyDown();
-      }
+        var offsetLeft = cellSize / 50;
+        var offsetRight = cellSize / 25;
+        ctx.drawImage(
+            sprite,
+            0,
+            0,
+            sprite.width,
+            sprite.height,
+            coord.x * cellSize + offsetLeft,
+            coord.y * cellSize + offsetLeft,
+            cellSize - offsetRight,
+            cellSize - offsetRight
+        );
+        if (coord.x === maze.endCoord().x && coord.y === maze.endCoord().y) {
+            onComplete(moves);
+            player.unbindKeyDown();
+        }
     }
-  
+
     function removeSprite(coord) {
-      var offsetLeft = cellSize / 50;
-      var offsetRight = cellSize / 25;
-      ctx.clearRect(
-        coord.x * cellSize + offsetLeft,
-        coord.y * cellSize + offsetLeft,
-        cellSize - offsetRight,
-        cellSize - offsetRight
-      );
+        var offsetLeft = cellSize / 50;
+        var offsetRight = cellSize / 25;
+        ctx.clearRect(
+            coord.x * cellSize + offsetLeft,
+            coord.y * cellSize + offsetLeft,
+            cellSize - offsetRight,
+            cellSize - offsetRight
+        );
     }
-  
+
     function movePlayer(direction) {
-      var cell = map[cellCoords.x][cellCoords.y];
-      moves++;
-      switch (direction) {
-        case "left":
-          if (cell.w == true) {
-            removeSprite(cellCoords);
-            cellCoords = {
-              x: cellCoords.x - 1,
-              y: cellCoords.y
-            };
-            drawSprite(cellCoords);
-          }
-          break;
-        case "up":
-          if (cell.n == true) {
-            removeSprite(cellCoords);
-            cellCoords = {
-              x: cellCoords.x,
-              y: cellCoords.y - 1
-            };
-            drawSprite(cellCoords);
-          }
-          break;
-        case "right":
-          if (cell.e == true) {
-            removeSprite(cellCoords);
-            cellCoords = {
-              x: cellCoords.x + 1,
-              y: cellCoords.y
-            };
-            drawSprite(cellCoords);
-          }
-          break;
-        case "down":
-          if (cell.s == true) {
-            removeSprite(cellCoords);
-            cellCoords = {
-              x: cellCoords.x,
-              y: cellCoords.y + 1
-            };
-            drawSprite(cellCoords);
-          }
-          break;
-      }
-    }
-  
-    function check(e) {
-      var direction;
-      switch (e.keyCode) {
-        case 65:
-        case 37: // west
-          direction = "left";
-          break;
-        case 87:
-        case 38: // north
-          direction = "up";
-          break;
-        case 68:
-        case 39: // east
-          direction = "right";
-          break;
-        case 83:
-        case 40: // south
-          direction = "down";
-          break;
-      }
-      if (direction) {
-        movePlayer(direction);
-      }
-    }
-  
-    function stopMove() {
-      clearInterval(moveInterval);
-    }
-  
-    this.bindKeyDown = function() {
-      window.addEventListener("keydown", check, false);
-      window.addEventListener("keyup", stopMove, false);
-  
-      $("#view").swipe({
-        swipe: function(
-          event,
-          direction,
-          distance,
-          duration,
-          fingerCount,
-          fingerData
-        ) {
-          switch (direction) {
-            case "up":
-              check({
-                keyCode: 38
-              });
-              break;
-            case "down":
-              check({
-                keyCode: 40
-              });
-              break;
+        var cell = map[cellCoords.x][cellCoords.y];
+        moves++;
+        switch (direction) {
             case "left":
-              check({
-                keyCode: 37
-              });
-              break;
+                if (cell.w == true) {
+                    removeSprite(cellCoords);
+                    cellCoords = {
+                        x: cellCoords.x - 1,
+                        y: cellCoords.y
+                    };
+                    drawSprite(cellCoords);
+                }
+                break;
+            case "up":
+                if (cell.n == true) {
+                    removeSprite(cellCoords);
+                    cellCoords = {
+                        x: cellCoords.x,
+                        y: cellCoords.y - 1
+                    };
+                    drawSprite(cellCoords);
+                }
+                break;
             case "right":
-              check({
-                keyCode: 39
-              });
-              break;
-          }
-        },
-        threshold: 0
-      });
+                if (cell.e == true) {
+                    removeSprite(cellCoords);
+                    cellCoords = {
+                        x: cellCoords.x + 1,
+                        y: cellCoords.y
+                    };
+                    drawSprite(cellCoords);
+                }
+                break;
+            case "down":
+                if (cell.s == true) {
+                    removeSprite(cellCoords);
+                    cellCoords = {
+                        x: cellCoords.x,
+                        y: cellCoords.y + 1
+                    };
+                    drawSprite(cellCoords);
+                }
+                break;
+        }
+    }
+
+    function check(e) {
+        var direction;
+        switch (e.keyCode) {
+            case 65:
+            case 37: // west
+                direction = "left";
+                break;
+            case 87:
+            case 38: // north
+                direction = "up";
+                break;
+            case 68:
+            case 39: // east
+                direction = "right";
+                break;
+            case 83:
+            case 40: // south
+                direction = "down";
+                break;
+        }
+        if (direction) {
+            movePlayer(direction);
+        }
+    }
+
+    function stopMove() {
+        clearInterval(moveInterval);
+    }
+
+    this.bindKeyDown = function() {
+        window.addEventListener("keydown", check, false);
+        window.addEventListener("keyup", stopMove, false);
+
+        // Destroy previous swipe event, preventing duplicate bindings
+        $("#view").swipe("destroy");
+
+        $("#view").swipe({
+            swipe: function(
+                event,
+                direction,
+                distance,
+                duration,
+                fingerCount,
+                fingerData
+            ) {
+                switch (direction) {
+                    case "up":
+                        check({
+                            keyCode: 38
+                        });
+                        break;
+                    case "down":
+                        check({
+                            keyCode: 40
+                        });
+                        break;
+                    case "left":
+                        check({
+                            keyCode: 37
+                        });
+                        break;
+                    case "right":
+                        check({
+                            keyCode: 39
+                        });
+                        break;
+                }
+            },
+            threshold: 0
+        });
     };
-  
+
     this.unbindKeyDown = function() {
-      window.removeEventListener("keydown", check, false);
-      window.removeEventListener("keyup", stopMove, false);
-      $("#view").swipe("destroy");
+        window.removeEventListener("keydown", check, false);
+        window.removeEventListener("keyup", stopMove, false);
+        $("#view").swipe("destroy");
     };
-  
+
     drawSprite(maze.startCoord());
-  
+
     this.bindKeyDown();
-  }
+}
+
   
   var mazeCanvas = document.getElementById("mazeCanvas");
   var ctx = mazeCanvas.getContext("2d");
