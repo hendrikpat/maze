@@ -389,7 +389,7 @@ input:focus, select:focus {
   }
   #mazeCanvas {
     width: 80%;
-    height: auto;
+    height: 80%;
   }
   #menu select, #menu input[type="button"] {
     font-size: 0.8em;

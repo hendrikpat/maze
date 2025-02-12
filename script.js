@@ -82,6 +82,7 @@ function rand(max) {
         makeMaze();
       }
     }
+    player.bindKeyDown(); // Re-bind swipe functionality after completing a maze
   }
   
   function updateMazeList() {
