@@ -383,7 +383,43 @@ function rand(max) {
     drawEndMethod();
   }
   
-  function Player(maze, c, _cellsize, onComplete, sprite = null) {
+  $("#view").swipe({
+    swipe: function(
+        event,
+        direction,
+        distance,
+        duration,
+        fingerCount,
+        fingerData
+    ) {
+        let keyCode;
+        switch (direction) {
+            case "up":
+                keyCode = 38;
+                break;
+            case "down":
+                keyCode = 40;
+                break;
+            case "left":
+                keyCode = 37;
+                break;
+            case "right":
+                keyCode = 39;
+                break;
+            default:
+                return; // Exit if the swipe direction is not recognized
+        }
+        // Create a keyboard event
+        var event = new KeyboardEvent('keydown', {
+            'keyCode': keyCode
+        });
+        // Dispatch the event
+        window.dispatchEvent(event);
+    },
+    threshold: 0
+});
+
+function Player(maze, c, _cellsize, onComplete, sprite = null) {
     var ctx = c.getContext("2d");
     var drawSprite;
     var moves = 0;
@@ -535,56 +571,19 @@ function rand(max) {
     this.bindKeyDown = function() {
         window.addEventListener("keydown", check, false);
         window.addEventListener("keyup", stopMove, false);
-
-        // Destroy previous swipe event, preventing duplicate bindings
-        $("#view").swipe("destroy");
-
-        $("#view").swipe({
-            swipe: function(
-                event,
-                direction,
-                distance,
-                duration,
-                fingerCount,
-                fingerData
-            ) {
-                switch (direction) {
-                    case "up":
-                        check({
-                            keyCode: 38
-                        });
-                        break;
-                    case "down":
-                        check({
-                            keyCode: 40
-                        });
-                        break;
-                    case "left":
-                        check({
-                            keyCode: 37
-                        });
-                        break;
-                    case "right":
-                        check({
-                            keyCode: 39
-                        });
-                        break;
-                }
-            },
-            threshold: 0
-        });
     };
 
     this.unbindKeyDown = function() {
         window.removeEventListener("keydown", check, false);
         window.removeEventListener("keyup", stopMove, false);
-        $("#view").swipe("destroy");
     };
 
     drawSprite(maze.startCoord());
 
     this.bindKeyDown();
 }
+
+
 
   
   var mazeCanvas = document.getElementById("mazeCanvas");
