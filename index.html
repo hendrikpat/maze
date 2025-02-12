@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maze</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <div id="page">
+
+    <div id="Message-Container">
+      <div id="message">
+        <h1>Congratulations!</h1>
+        <p>You are done.</p>
+        <p id="moves"></p>
+        <input id="okBtn" type="button" onclick="toggleVisablity('Message-Container')" value="Cool!" />
+      </div>
+    </div>
+
+    <div id="endMessage" style="display: none;">
+      <h1>Game Over</h1>
+      <p id="endMessageText"></p>
+      <button onclick="closeEndMessage()">Close</button>
+    </div>
+
+    <br>
+    <div id="menu">
+      <div class="custom-select">
+        <select id="diffSelect" onchange="updateHighscoreList()">
+          <option value="2">Super Easy</option>
+          <option value="3">Easy</option>
+          <option value="4">Medium</option>
+          <option value="6">Advanced</option>
+          <option value="8">Hard</option>
+          <option value="10">Very Hard</option>
+          <option value="14">Extreme</option>
+          <option value="18">Insane</option>
+        </select>
+      </div>
+      <div class="custom-select">
+        <select id="modeSelect" onchange="updateHighscoreList();toggleGameModeOptions()">  
+          <option value="timeRush">Time Rush</option>
+          <option value="speedrun">Speedrun</option>
+        </select>
+      </div>
+      <div class="custom-select" id="timeRushOptions" onchange="updateHighscoreList()">
+        <select id="timeSelect">
+          <option value="30">30 Seconds</option>
+          <option value="60">1 Minute</option>
+          <option value="120">2 Minutes</option>
+          <option value="180">3 Minutes</option>
+          <option value="300">5 Minutes</option>
+          <option value="600">10 Minutes</option>
+          <option value="1800">30 Minutes</option>
+        </select>
+      </div>
+      <div class="custom-select" id="speedrunOptions" style="display: none;" onchange="updateHighscoreList()">
+        <select id="mazeCountSelect">
+          <option value="5">5 Mazes</option>
+          <option value="10">10 Mazes</option>
+          <option value="25">25 Mazes</option>
+          <option value="50">50 Mazes</option>
+          <option value="100">100 Mazes</option>
+          <option value="250">250 Mazes</option>
+          <option value="500">500 Mazes</option>
+          <option value="1000">1000 Mazes</option>
+        </select>
+      </div>
+      <input id="startMazeBtn" type="button" onclick="startGame()" value="Start" />
+    </div>
+
+    <div id="view">
+      <div id="mazeContainer">
+        <canvas id="mazeCanvas" class="border" height="1100" width="1100"></canvas>
+      </div>
+    </div>
+
+    <p id="instructions">Use arrow keys to move around!</p>
+
+    <div id="timer">00:00.000</div>
+    <div id="score">Score: 0</div>
+
+  </div>
+
+  <div id="completedMazes" style="position: fixed; left: 0; top: 0; width: 200px; height: 100%; overflow-y: auto; background-color: #2e2e2e; padding: 10px;">
+    <h2>Completed Mazes</h2>
+    <div id="mazeList"></div>
+  </div>
+
+  <div id="highscores" style="position: fixed; right: 0; top: 0; width: 200px; height: 100%; overflow-y: auto; background-color: #2e2e2e; padding: 10px;">
+    <h2 class="hs-text">Highscores</h2>
+    <button id="adminBtn" onclick="toggleAdminMode()">🛡️</button><button id="refreshButton" class="adminButton" onclick="updateHighscoreList()">🔄</button>
+    <div id="highscoreList"></div>
+  </div>
+
+  <div id="usernameInputContainer" style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; align-items: center;">
+    <div id="volumeControls" style="margin-right: 10px;">
+      <span id="volumeLevel">50</span>%
+      <input type="range" id="volumeSlider" min="0" max="100" value="50" style="width: 100px;">
+    </div>
+    <div id="usernameControls" style="display: flex; align-items: center;">
+      <span id="usernameDisplay">GUEST</span>
+      <input type="text" id="username" placeholder="NAME" maxlength="12" style="display: none;" autocomplete="off">
+      <button id="editUsernameBtn" onclick="editUsername()">✏️</button>
+    </div>
+  </div>
+
+  <audio id="victorySound" src="./assets/sound.mp3" preload="auto"></audio>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.18/jquery.touchSwipe.min.js"></script>
+  
+  <script src="./script.js"></script>
+</body>
+</html>
