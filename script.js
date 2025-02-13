@@ -71,8 +71,8 @@ function rand(max) {
     if (gameMode === "timeRush") {
         score++;
         document.getElementById("score").innerText = "Score: " + score;
-        handleGameOver(score);
-        makeMaze();
+        makeMaze(); // Generate a new maze
+        player = new Player(maze, mazeCanvas, cellSize, displayVictoryMess, sprite); // Reset player position
         player.bindKeyDown();
     } else if (gameMode === "speedrun") {
         score++;
@@ -82,9 +82,8 @@ function rand(max) {
             endGame();
         } else {
             makeMaze();
+            player = new Player(maze, mazeCanvas, cellSize, displayVictoryMess, sprite); // Reset player position
             player.bindKeyDown();
-
-            player.bindKeyDown(); // Re-bind swipe functionality after completing a maze
         }
     } else {
         cancelAnimationFrame(animationId);
@@ -733,7 +732,7 @@ function Player(maze, c, _cellsize, onComplete, sprite = null) {
   
       if (direction === "down") {
         var remainingTime = limit * 1000 - elapsedTime;
-        if (remainingTime <= 10) { // Adjusted to account for slight delay
+        if (remainingTime <= 0) { // Adjusted to account for slight delay
           clearInterval(timerInterval);
           endGame();
         } else {
